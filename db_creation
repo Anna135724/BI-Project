@@ -1,0 +1,75 @@
+USE AIRPORT_DB;
+
+
+CREATE TABLE Airline (
+    airline_id INT identity(1,1) PRIMARY KEY ,
+    airline_name VARCHAR(100) NOT NULL,
+    destination_city VARCHAR(100) NOT NULL,
+    destination_country VARCHAR(100) NOT NULL,
+);
+ 
+CREATE TABLE Aircraft (
+    aircraft_id INT identity(1,1) PRIMARY KEY ,
+    aircraft_type VARCHAR(100) NOT NULL,
+    total_seats INT NOT NULL,
+	capacity_k1 INT NOT NULL,
+    capacity_k2 INT NOT NULL,
+    capacity_k3 INT NOT NULL,
+    weight_max INT NOT NULL,
+);
+
+CREATE TABLE Ticket (
+    ticket_number INT identity(1,1) PRIMARY KEY ,
+    seat_number VARCHAR(10),
+	class VARCHAR(20) NOT NULL CHECK (class IN ('Economic', 'Second', 'First')),
+    ticket_price INT NOT NULL,
+);
+
+CREATE TABLE Flights (
+    flight_id INT identity(1,1) PRIMARY KEY,
+    predictet_departure_time DATETIME NOT NULL,
+    predictet_arrival_time DATETIME NOT NULL,
+    real_time_departure DATETIME NOT NULL,
+    real_time_arrival DATETIME NOT NULL,
+    destination VARCHAR(100) NOT NULL,
+	type_of_flight VARCHAR(20) NOT NULL CHECK (type_of_flight IN ('Direct Flight', 'Transit')),
+	airline_id INT REFERENCES Airline(airline_id),
+	aircraft_id INT REFERENCES Aircraft(aircraft_id),
+	ticket_number INT REFERENCES Ticket(ticket_number),
+   
+);
+
+CREATE TABLE Passenger (
+    NID VARCHAR(15) PRIMARY KEY NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    ticket_number INT REFERENCES Ticket(ticket_number)
+);
+
+CREATE TABLE Baggage (
+    search_number VARCHAR(28) PRIMARY KEY NOT NULL,
+    NID VARCHAR(15) NOT NULL,
+    weights DECIMAL(4,2) NOT NULL,
+    sector VARCHAR(4) NOT NULL,
+    FOREIGN KEY (NID) REFERENCES Passenger(NID)
+);
+
+CREATE TABLE Terminal (
+    code INT PRIMARY KEY IDENTITY,
+    descriptions VARCHAR(500),
+	airline_id INT REFERENCES Airline(airline_id),
+);
+
+CREATE TABLE Gates (
+    gate_number INT PRIMARY KEY,
+    terminal VARCHAR(10),
+    airline_assigned INT REFERENCES Airline(airline_id),
+	terminal_assigned INT REFERENCES Terminal(code)
+);
+
+CREATE TABLE Hangars (
+    id_nr INT IDENTITY(1,1) PRIMARY KEY,
+    aircraft_id INT REFERENCES Aircraft(aircraft_id),
+);
